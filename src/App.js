@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import repeatArray from "./repeatArray";
+import "./App.css";
 
+const count = 15;
+const text = repeatArray
+  .map(
+    ({ title, repeatText }) =>
+      `${title} ${new Array(count).fill(repeatText).join("")}`
+  )
+  .join(" ");
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [str, setStr] = useState(text);
+  useEffect(() => {
+    const keydownHandler = ({ key }) => {
+      const pattern = new RegExp(
+        `^${key.length === 1 && ["]"].indexOf(key) === -1 ? `[${key}]` : key}`
+      );
+      setStr(prevStr => {
+        const resultStr = prevStr.replace(pattern, "");
+        if (!resultStr) {
+          return text;
+        }
+        return resultStr;
+      });
+    };
+    document.body.addEventListener("keydown", keydownHandler);
+    return () => document.body.removeEventListener("keydown", keydownHandler);
+  }, []);
+  return <div className="text">{str.replace(/ /g, "•").slice(0, 40)}</div>;
 }
 
 export default App;
